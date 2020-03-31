@@ -35,7 +35,7 @@ d3.csv("assets/data/data.csv").then(function(data) {
     });
 
     // scales
-    var xLinearScale = d3.scaleTime()
+    var xLinearScale = d3.scaleLinear()
       .domain([d3.min(data, d => d.obesity)-1, d3.max(data, d => d.obesity)+2])
       .range([0, width]);
 
