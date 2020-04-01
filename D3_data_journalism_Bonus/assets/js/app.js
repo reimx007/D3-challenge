@@ -45,7 +45,7 @@ function yScale(data, chosenYAxis) {
     .domain([d3.min(data, d => d[chosenYAxis])  * 0.9,
       d3.max(data, d => d[chosenYAxis]) * 1.1
     ])
-    .range([0, width]);
+    .range([height, 0]);
 
   return yLinearScale;
 }
@@ -89,7 +89,7 @@ function renderText(textGroup, newXScale, chosenXAxis) {
     .attr("x", d => newXScale(d[chosenXAxis]));
   return textGroup;
 }
-function renderYCircles(circlesGroup, newXScale, chosenYAxis) {
+function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
   circlesGroup.transition()
     .duration(1000)
@@ -97,7 +97,7 @@ function renderYCircles(circlesGroup, newXScale, chosenYAxis) {
   return circlesGroup;
 }
 
-function renderYText(textGroup, newXScale, chosenYAxis) {
+function renderYText(textGroup, newYScale, chosenYAxis) {
 
   textGroup.transition()
     .duration(1000)
@@ -145,9 +145,13 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
   // parse data
   data.forEach(function(data) {
     data.income = +data.income;
+    console.log(data.income);
     data.obesity = +data.obesity;
+    console.log(data.obesity);
     data.smokes = +data.smokes;
+    console.log(data.smokes);
     data.poverty = +data.poverty;
+    console.log(data.poverty);
   });
 
   // xLinearScale function above csv import
@@ -155,6 +159,11 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
   // Create y scale function
   var yLinearScale = yScale(data, chosenYAxis);
+
+  // // Create y scale function
+  // var yLinearScale = d3.scaleLinear()
+  //   .domain([0, d3.max(data, d => d.income)])
+  //   .range([height, 0]);
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
@@ -178,6 +187,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .attr("y", 20 - margin.left)
     .attr("x", 200 - (height / 2))
     .attr("dy", "1em")
+    .attr("value", "income")
     .classed("active", true)
     .text("Median Household Income");
 
@@ -186,6 +196,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .attr("y", 0 - margin.left)
     .attr("x", 200 - (height / 2))
     .attr("dy", "1em")
+    .attr("value", "poverty")
     .classed("inactive", true)
     .text("Poverty %");
 
@@ -195,7 +206,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    .attr("cy", d => yLinearScale(d[chosenYAxis])
+    .attr("cy", d => yLinearScale(d[chosenYAxis]))
     .attr("r", 20)
     .attr("fill", "#44c8f5")
     .attr("opacity", ".5");
@@ -208,7 +219,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .text(d => d.abbr)
     .attr('font-size',8)//font size
     .attr('x', d => xLinearScale(d[chosenXAxis]))
-    .attr('y',d => yLinearScale(d[chosenYAxis])
+    .attr('y', d => yLinearScale(d[chosenYAxis]))
     .attr('dx', -6)
     .attr('dy', 3);
 
@@ -300,10 +311,10 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         yAxis = renderYAxes(yLinearScale, yAxis);
 
         // updates circles with new x values
-        circlesGroup = renderYCircles(circlesGroup, xLinearScale, chosenYAxis);
+        circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
 
         // updates cirle labels with new x values
-        textGroup = renderYText(textGroup, xLinearScale, chosenYAxis);
+        textGroup = renderYText(textGroup, yLinearScale, chosenYAxis);
 
         // // updates tooltips with new info
         // circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
