@@ -65,7 +65,7 @@ function renderAxes(newXScale, xAxis) {
 function renderYAxes(newYScale, yAxis) {
   var leftAxis = d3.axisLeft(newYScale);
 
-  xAxis.transition()
+  yAxis.transition()
     .duration(1000)
     .call(leftAxis);
 
@@ -107,25 +107,34 @@ function renderYText(textGroup, newYScale, chosenYAxis) {
 }
 
 // function used for updating circles group with new tooltip
-function updateToolTip(chosenXAxis, circlesGroup) {
+function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
 
-  var label;
+  var xlabel;
+  var ylabel;
 
   if (chosenXAxis === "obesity") {
-    label = "Obesity %";
+    xlabel = "Obesity %:";
   }
   else {
-    label = "Smoking %";
+    xlabel = "Smoking %:";
+  }
+  if (chosenYAxis === "income") {
+    ylabel = "MHI:";
+  }
+  else {
+    ylabel = "Poverty %:";
   }
 
   var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80, -60])
     .html(function(d) {
-      return (`${d.state}<br>${label} ${d[chosenXAxis]}`);
+      return (`${d.state}<br>${xlabel} ${d[chosenXAxis]}
+        <br>${ylabel} ${d[chosenYAxis]}`);
     });
 
   circlesGroup.call(toolTip);
+
 
   circlesGroup.on("mouseover", function(data) {
     toolTip.show(data);
@@ -134,7 +143,6 @@ function updateToolTip(chosenXAxis, circlesGroup) {
     .on("mouseout", function(data, index) {
       toolTip.hide(data);
     });
-
   return circlesGroup;
 }
 
@@ -175,8 +183,12 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .attr("transform", `translate(0, ${height})`)
     .call(bottomAxis);
 
-  chartGroup.append("g")
+
+  var yAxis = chartGroup.append("g")
+    .classed("x-axis", true)
     .call(leftAxis);
+  // chartGroup.append("g")
+  //   .call(leftAxis);
 
   // append y axis
   var ylabelsGroup = chartGroup.append("g")
@@ -207,7 +219,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 20)
+    .attr("r", 13)
     .attr("fill", "#44c8f5")
     .attr("opacity", ".5");
 
@@ -243,7 +255,10 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
 
 
   // updateToolTip function above csv import
-  var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+  var circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
+
+  // // updateToolTip function above csv import
+  // var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
   // x axis labels event listener
   labelsGroup.selectAll("text")
@@ -271,7 +286,7 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         textGroup = renderText(textGroup, xLinearScale, chosenXAxis);
 
         // updates tooltips with new info
-        circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+        circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
         // changes classes to change bold text
         if (chosenXAxis === "smokes") {
@@ -316,8 +331,8 @@ d3.csv("assets/data/data.csv").then(function(data, err) {
         // updates cirle labels with new x values
         textGroup = renderYText(textGroup, yLinearScale, chosenYAxis);
 
-        // // updates tooltips with new info
-        // circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+        // updates tooltips with new info
+        circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
         // changes classes to change bold text
         if (chosenYAxis === "poverty") {
