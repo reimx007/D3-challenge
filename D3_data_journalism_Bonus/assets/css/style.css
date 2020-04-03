@@ -71,6 +71,13 @@ body {
   transition: fill 0.3s ease-out;
   text-anchor: middle;
 }
+.source {
+  font-weight: lighter;
+  font-size: 8;
+  fill: lightgray;
+  /* transition: fill 0.3s ease-out; */
+  text-anchor: middle;
+}
 
 .inactive:hover {
   fill: #113c66;

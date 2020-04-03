@@ -1,6 +1,8 @@
+// set height and width of SVGs
 var svgWidth = 960;
 var svgHeight = 500;
 
+// set margins
 var margin = {
   top: 20,
   right: 40,
@@ -8,6 +10,7 @@ var margin = {
   left: 100
 };
 
+// set width and height of chart
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
@@ -23,9 +26,7 @@ var chartGroup = svg.append("g")
 // Import Data
 d3.csv("assets/data/data.csv").then(function(data) {
 
-    // Step 1: Parse Data/Cast as numbers
-    // id,state,abbr,poverty,povertyMoe,age,ageMoe,income,incomeMoe,healthcare,healthcareLow,healthcareHigh,obesity,obesityLow,obesityHigh,smokes,smokesLow,smokesHigh
-    // ==============================
+    // Parse Data/Cast as numbers
     data.forEach(function(data) {
       // data.abbr = data.abbr;
       data.income = +data.income;
@@ -34,22 +35,22 @@ d3.csv("assets/data/data.csv").then(function(data) {
       console.log(data.obesity);
     });
 
-    // scales
+    //  set scales
     var xLinearScale = d3.scaleLinear()
       .domain([d3.min(data, d => d.obesity)-1, d3.max(data, d => d.obesity)+2])
       .range([0, width]);
 
-    console.log(xLinearScale);
+    // console.log(xLinearScale);
     var yLinearScale = d3.scaleLinear()
       .domain([d3.min(data, d => d.income)- 2000, d3.max(data, d => d.income)])
       .range([height, 0]);
-    console.log(yLinearScale);
+    // console.log(yLinearScale);
 
-      // create axis
+      // create axes
       var xAxis = d3.axisBottom(xLinearScale);
       var yAxis = d3.axisLeft(yLinearScale);
 
-      // append axis to a the chart
+      // append axes to a the chart
       chartGroup.append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(xAxis);
@@ -66,18 +67,16 @@ d3.csv("assets/data/data.csv").then(function(data) {
         .attr("cy", d => yLinearScale(d.income))
         .attr("r", "10")
         .attr("fill", "#44c8f5")
-        // .attr("fill", "#3e1151")
-        // .attr("stroke-width", "1")
-        // .attr("stroke", "black")
         .attr("opacity", ".5");
 
+      // create the text groups (state labels)
       var textGroup = chartGroup.append('g')
         .selectAll('text')
         .data(data)
         .enter().append('text')
         .attr("class", "circleText")
         .text(d => d.abbr)
-        .attr('font-size',8)//font size
+        .attr('font-size',8)
         .attr('x', d => xLinearScale(d.obesity))
         .attr('y',d => yLinearScale(d.income))
         .attr('dx', -6)
@@ -91,12 +90,10 @@ d3.csv("assets/data/data.csv").then(function(data) {
           return (`${d.state}<br>Obesity %: ${d.obesity}<br> HH Income: ${d.income}`);
         });
 
-      // Step 7: Create tooltip in the chart
-      // ==============================
+      // CAll tooltip in the chart
       chartGroup.call(toolTip);
 
-      // Step 8: Create event listeners to display and hide the tooltip
-      // ==============================
+      // Create event listeners to display and hide the tooltip, for both the circles and text
       circlesGroup.on("click", function(data) {
         toolTip.show(data, this);
       })
